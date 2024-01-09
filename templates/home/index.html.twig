@@ -98,21 +98,30 @@
                                                     {% if  now < end and now > start %}
                                                     <span class="badge badge-soft-danger font-size-12"><i class="mdi mdi-clock-outline font-size-14 me-1 align-middle"></i>{{ today_end.format('%d Days Left') }}</span>
                                                     {% endif %}
-                                                    {% if today_start.invert %}
-                                                        {% if  now > start %}
-                                                        {% endif %}
-                                                    {% else %}
-                                                        {% if  now < start %}
-                                                            <span class="badge badge-soft-primary font-size-12"><i class="mdi mdi-clock-outline font-size-14 me-1 align-middle"></i>{{ today_start.format('%d Days Left to start') }}</span>
-                                                        {% endif %}
-                                                    {% endif %}
+                                                            {% if today_start.invert %}
+                                                                {% if now > start %}
+                                                                    <div class="badge badge-soft-warning  font-size-14">{{ today_start.format('Started %d ago') }}</div>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                {% if now < start %}
+                                                                    {% set daysLeft = today_start.days %}
+                                                                    <div class="badge badge-soft-info  font-size-14">
+                                                                        {% if daysLeft == 1 %}
+                                                                            {{ daysLeft }} Day Left to start
+                                                                        {% else %}
+                                                                            {{ daysLeft }} Days Left to start
+                                                                        {% endif %}
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% endif %}
                                                 {% endif %}
+                                                {% set eventIdToCheck = ae.id %} 
                                                 <div class="avatar-group align-items-center">
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         {% if  Today > deadline %}
                                                             <span class="text-danger font-size-12">Too Late To Join This Event</span>
                                                         {% else %}
-                                                            {% if check|length == 0%}
+                                                            {% if check|length == 0 and userJoinedOrNot %}
                                                                 <a href="{{ path('add_participant', {'id_event': ae.id,'id_user': id,'user_matricule':mat}) }}" class="btn btn-primary">Join</a>
                                                             {% else %}
                                                                 <span class="text-success font-size-12">Joined</span>

@@ -27,6 +27,37 @@ class HomeController extends AbstractController
         $this->em = $em;
     }
 
+        /**
+     * Check if the current user has joined a specific event.
+     *
+     * @param int $eventId
+     * @return bool
+     */
+    private function hasUserJoinedEvent(int $eventId): bool
+    {
+        $user = $this->getUser();
+        
+        if ($user) {
+            $userId = $user->getId();
+
+            // Check if the user has joined the event
+            $check = $this->em->createQueryBuilder()
+                ->select('e')
+                ->from(Participants::class, 'e')
+                ->where('e.id_user = :userId')
+                ->andWhere('e.id_event = :eventId')
+                ->setParameter('userId', $userId)
+                ->setParameter('eventId', $eventId);
+
+            $queryCheck = $check->getQuery();
+            $result = $queryCheck->getResult();
+
+            return count($result) > 0;
+        }
+
+        return false;
+    }
+
     #[Route('/home', name: 'app_home')]
     public function index(Request $request): Response
     {
@@ -70,6 +101,9 @@ class HomeController extends AbstractController
         $check_done = $query_check->getResult();
 
 
+        $eventIdToCheck = 1; 
+        $userJoinedEvent = $this->hasUserJoinedEvent($eventIdToCheck);
+
         return $this->render('home/index.html.twig', [
             'id'=>$id,
             'firstName' => $firstName,
@@ -79,6 +113,8 @@ class HomeController extends AbstractController
             'mat'=>$matricule,
             'check'=>$check_done,
             'form' => $form->createView(),
+            'eventIdToCheck' => $eventIdToCheck,
+            'userJoinedOrNot'=> $userJoinedEvent
         ]);
     }
 
