@@ -65,16 +65,17 @@
                                     </a>
                                 </li>
 
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-pages" role="button">
-                                        <i class="bx bx-calendar-event icon"></i>
-                                        <span data-key="t-apps">Events</span> <div class="arrow-down"></div>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="topnav-pages">
-
-                                        <a href="{{ path('app_admin_Calendar') }}" class="dropdown-item" data-key="t-calendar">Calendar</a>
-                                    </div>
-                                </li>
+                                {% if app.user and is_granted('ROLE_ADMIN') %}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-pages" role="button">
+                                            <i class="bx bx-calendar-event icon"></i>
+                                            <span data-key="t-apps">Events</span> <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-pages">
+                                            <a href="{{ path('app_admin_Calendar') }}" class="dropdown-item" data-key="t-calendar">Calendar</a>
+                                        </div>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </div>
                     </nav>
