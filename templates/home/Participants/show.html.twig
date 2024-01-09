@@ -1,0 +1,53 @@
+{% extends 'home/base.html.twig' %}
+{% block title %}User participants{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header justify-content-between d-flex align-items-center">
+                    <h4 class="card-title">Participants of Event N° {{ event_number }}</h4>
+                </div><!-- end card header -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>First Name</th>
+                                <th>Second Name</th>
+                                <th>Matricule</th>
+                                <th>Email</th>
+                                <th>Stat</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                                {% if part_of_event|length == 0 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No Participants Found For This Event</td>
+                                    </tr>
+                                {% else %}
+                                    {%for p in part_of_event %}
+                                    <tr>
+                                        <th scope="row">{{ p.id }}</th>
+                                        <td>{{ p.firstname }}</td>
+                                        <td>{{ p.secondname }}</td>
+                                        <td>{{ p.matricule }}</td>
+                                        <td>{{ p.email }}</td>
+                                        {% set stat = p.active %}
+                                        {% if stat==1 %}
+                                            <td><i class="fa-solid fa-circle text-success"></i> Online</td>
+                                        {% else %}
+                                            <td><i class="fa-solid fa-circle text-secondary"></i> Offline</td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody><!-- end tbody -->
+                        </table><!-- end table -->
+                    </div><!-- end responsive -->
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col -->
+    </div><!-- end row -->
+{% endblock %}

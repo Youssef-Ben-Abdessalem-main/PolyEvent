@@ -1,0 +1,139 @@
+{% extends 'home/base.html.twig' %}
+{% block body %}
+<!-- dropzone css -->
+<link href="{{ asset("libs/dropzone/min/dropzone.min.css") }}" rel="stylesheet" type="text/css" />
+
+<!-- flatpickr css -->
+<link href="{{ asset("libs/flatpickr/flatpickr.min.css") }}" rel="stylesheet" type="text/css">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <ul class="wizard-nav mb-5">
+                        <li class="wizard-list-item">
+                            <div class="list-item">
+                                <div class="step-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                     title="Basic Info">
+                                    <i class="fa-solid fa-1"></i>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="wizard-list-item">
+                            <div class="list-item">
+                                <div class="step-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                     title="Assignee">
+                                    <i class="fa-solid fa-2"></i>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="wizard-list-item">
+                            <div class="list-item">
+                                <div class="step-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                     title="Attached Files">
+                                    <i class="fa-solid fa-3"></i>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- wizard-nav -->
+
+
+                    <div class="wizard-tab">
+                        <div class="text-center mb-4">
+                            <h5>Event Information</h5>
+                            <p class="card-title-desc">N°{{ displayitem.id }}</p>
+                        </div>
+                        <form>
+                            <div>
+                                <div class="mb-3">
+                                    <label for="projectname" class="form-label">Event Title</label>
+                                    <input id="projectname" type="text" class="form-control" value="{{ displayitem.title }}" disabled>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="projectdesc" class="form-label">Project Description</label>
+                                    <textarea class="form-control" id="projectdesc" rows="3"  disabled>{{ displayitem.discription }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">DeadLine</label>
+                                    <input type="text" class="form-control" id="datepicker-range" value="{{ displayitem.deadline|date('Y-m-d') }}" disabled>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- wizard-tab -->
+
+                    <div class="wizard-tab">
+                        <div class="text-center mb-4">
+                            <h5>Event Dates</h5>
+                            <p class="card-title-desc">Start & End</p>
+                        </div>
+                        <form>
+                            <div>
+                                <div class="mb-3">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="text" class="form-control" id="datepicker-range" value="{{ displayitem.DateStart|date('Y-m-d') }}" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">End Date</label>
+                                    <input type="text" class="form-control" id="datepicker-range" value="{{ displayitem.DateEnd|date('Y-m-d') }}" disabled>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- wizard-tab -->
+
+                    <div class="wizard-tab">
+                        <div class="text-center mb-4">
+                            <h5>Event Link</h5>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectname" class="form-label">Event Link</label>
+                            <input id="projectname" type="text" class="form-control" value="{{ displayitem.link }}" disabled>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-3 mt-4">
+                        <button type="button" class="btn btn-primary w-sm" id="prev">Previous</button>
+                        <button type="button" class="btn btn-primary w-sm ms-auto" id="next" >Next</button>
+                    </div>
+                </div>
+            </div><!-- end card body -->
+        </div><!-- end card -->
+    </div><!-- end col -->
+</div><!-- end row -->
+<!-- flatpickr js -->
+<script src="{{ asset("libs/flatpickr/flatpickr.min.js") }}"></script>
+
+<!-- dropzone plugin -->
+<script src="{{ asset("libs/dropzone/min/dropzone.min.js") }}"></script>
+
+<!-- init js -->
+<script src="{{ asset("js/pages/project-create.init.js") }}"></script>
+
+<script src="{{ asset("assets/js/app.js") }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var currentTab = 0;
+        $("#next").click(function() {
+            $(".wizard-tab:eq(" + currentTab + ")").hide();
+            currentTab++;
+            if (currentTab >= $(".wizard-tab").length) {
+                currentTab = 0;
+            }
+            $(".wizard-tab:eq(" + currentTab + ")").show();
+        });
+        $("#prev").click(function() {
+            $(".wizard-tab:eq(" + currentTab + ")").hide();
+            currentTab--;
+            if (currentTab < 0) {
+                currentTab = $(".wizard-tab").length - 1;
+            }
+            $(".wizard-tab:eq(" + currentTab + ")").show();
+        });
+
+    });
+</script>
+{% endblock %}

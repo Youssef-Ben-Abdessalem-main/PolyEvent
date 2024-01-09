@@ -1,0 +1,122 @@
+{% extends 'admin/base.html.twig' %}
+{% block body %}
+        <div class="col-lg-12">
+                <div class="row">
+                        <div class="col-xl-8">
+                                <div class="card">
+                                        <div class="card-body pb-3">
+                                                <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1">
+                                                                <h5 class="card-title mb-2">Active users</h5>
+                                                        </div>
+                                                </div>
+
+                                                <div class="">
+                                                        <div class="table-responsive">
+                                                                <table class="table project-list-table table-nowrap align-middle table-borderless mb-0">
+                                                                        <thead>
+                                                                        <tr>
+                                                                                <th scope="col">Number</th>
+                                                                                <th scope="col">Matricule</th>
+                                                                                <th scope="col">First Name</th>
+                                                                                <th scope="col">Second Name</th>
+                                                                                <th scope="col">Email</th>
+                                                                                <th scope="col">Stat</th>
+                                                                        </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                        {% if users|length==1 %}
+                                                                                <tr>
+                                                                                        <td COLSPAN="6" CLASS="text-center">No Online Users Found <i class="fa-solid fa-face-sad-sweat"></i></td>
+                                                                                </tr>
+                                                                        {% else %}
+                                                                        {% for user in users %}
+                                                                                {% if user.roles|join(', ') != 'ROLE_ADMIN' %}
+                                                                        <tr>
+                                                                                <td><div class="avatar-sm"><span class="avatar-title rounded-circle bg-info text-white font-size-16">{{ user.id }}</span></div></td>
+                                                                                <td>{{ user.matricule }}</td>
+                                                                                <td>{{ user.FirstName }}</td>
+                                                                                <td><span>{{ user.SecondName }}</span></td>
+                                                                                <td><p class="mb-0">{{ user.email }}</p></td>
+                                                                                <td><p class="mb-0"><i class="mdi mdi-square-rounded font-size-10 text-success me-2"></i>Online</p></td>
+                                                                        </tr>
+                                                                                {% endif %}
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        </tbody>
+                                                                </table>
+                                                        </div>
+                                                </div>
+
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="col-xl-4">
+                                <div class="card">
+                                        <div class="card-body">
+                                                <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1">
+                                                                <h5 class="card-title mb-2">Event Chart</h5>
+                                                        </div>
+                                                </div>
+
+                                                <canvas id="myChart" width="350" height="350"></canvas>
+
+                                                <div class="mt-1 px-2">
+                                                        <div class="order-wid-list d-flex justify-content-between border-bottom">
+                                                                <p class="mb-0"><i class="mdi mdi-square-rounded font-size-10 text-primary me-2"></i>Event Completed</p>
+                                                                <div>
+                                                                        <span class="pe-5">{{ countcompletedevents }}</span>
+                                                                </div>
+                                                        </div>
+                                                        <div class="order-wid-list d-flex justify-content-between border-bottom">
+                                                                <p class="mb-0"><i class="mdi mdi-square-rounded font-size-10 text-success me-2"></i>Event Active</p>
+                                                                <div>
+                                                                        <span class="pe-5">{{ countActiveevents }}</span>
+                                                                </div>
+                                                        </div>
+                                                        <div class="order-wid-list d-flex justify-content-between">
+                                                                <p class="mb-0"><i class="mdi mdi-square-rounded font-size-10 text-danger me-2"></i>Event Archived</p>
+                                                                <div>
+                                                                        <span class="pe-5">{{ Archived }}</span>
+                                                                </div>
+                                                        </div>
+                                                </div>
+
+                                        </div>
+                                </div>
+                        </div>
+                </div>
+        </div><!-- end col -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+        <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                                labels: ['Completed', 'Active', 'Archived'],
+                                datasets: [{
+                                        label: '# of Votes',
+                                        data: [{{ countcompletedevents }}, {{ countActiveevents }}, {{ Archived }}],
+                                        backgroundColor: [
+                                                'rgba(2, 117, 216, 0.2)',
+                                                'rgba(92, 184, 92, 0.2)',
+                                                'rgba(217, 83, 79, 0.2)'
+                                        ],
+                                        borderColor: [
+                                                'rgba(2, 117, 216, 1)',
+                                                'rgba(92, 184, 92, 1)',
+                                                'rgba(217, 83, 79, 1)'
+                                        ],
+                                        borderWidth: 1
+                                }]
+                        },
+                        options: {
+                                responsive: false,
+                                maintainAspectRatio: false
+                        }
+                });
+        </script>
+{% endblock %}
+
+

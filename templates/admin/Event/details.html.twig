@@ -1,0 +1,558 @@
+{% extends 'admin/base.html.twig' %}
+{% block body %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="mt-2">
+                    <ul class="nav nav-tabs nav-tabs-custom mb-4" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#list-all" role="tab">All</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#list-Completed">Completed</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#list-active">Active</a>
+                        </li>
+                    </ul><!-- end ul -->
+                </div>
+
+                <!-- Tab content -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="list-all" role="tabpanel">
+                        <div>
+                            <div>
+                                {% if events is empty%}
+                                    <div class="card text-center">
+                                        <div class="card-header">
+                                            No Events Found
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    {% for e in events %}
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex">
+                                                <div class="avatar-sm">
+                                                    <span class="avatar-title rounded-circle bg-info text-white font-size-16">{{ e.id }}</span>
+                                                </div>
+                                                <div class="flex-grow-1 me-2 flex-wrap ms-3">
+                                                    <h5 class="font-size-15 mb-1"><a href="projects-overview.html" class="text-dark">{{ e.title }}</a></h5>
+                                                    <p class="text-muted mb-0">{{ e.Discription }}</p>
+                                                </div>
+                                                <div class="flex-shrink-0">
+                                                    <div class="d-flex gap-2">
+                                                        <div class="dropdown">
+                                                            <a class="btn btn-light btn-sm dropdown-toggle" href="#" role="button"
+                                                               data-bs-toggle="dropdown" aria-haspopup="true">
+                                                                <i class="fa-sharp fa-solid fa-bars"></i>
+                                                            </a>
+                                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li>
+                                                                    {% if e.CheckValid == 0 or e.CheckValid == 2 %}
+                                                                        <a class="dropdown-item text-success" href="{{ path('validate_event', {'id': e.id}) }}"><i class="fa-solid fa-check"></i> Validate</a>
+                                                                    {% endif %}
+                                                                    {% if e.CheckValid == 1  %}
+                                                                        <a class="dropdown-item text-danger" href="{{ path('decline_event', {'id': e.id}) }}"><i class="fa-sharp fa-solid fa-xmark"></i> Decline</a>
+                                                                    {% endif %}
+                                                                </li>
+                                                                {% if e.CheckValid == 0  %}
+                                                                    <li><a class="dropdown-item text-danger" href="{{ path('decline_event', {'id': e.id}) }}"><i class="fa-sharp fa-solid fa-xmark"></i> Decline</a></li>
+                                                                {% endif %}
+                                                                <li>
+                                                                    {% if e.CheckArchive == 0 %}
+                                                                        <a class="dropdown-item text-secondary" href="{{ path('archive_event', {'id': e.id}) }}"><i class="fa-solid fa-box-archive"></i> Archived</a>
+                                                                    {% endif %}
+                                                                    {% if e.CheckArchive == 1 %}
+                                                                        <a class="dropdown-item text-secondary" href="{{ path('unarchive_event', {'id': e.id}) }}"><i class="fa-solid fa-box-archive"></i> Unarchived</a>
+                                                                    {% endif %}
+                                                                </li>
+                                                                <li><hr class="dropdown-divider"></li>
+                                                                <li>
+                                                                    <a class="dropdown-item text-primary" href="{{ path('app_admin_display', {'identidfiant': e.id}) }}"><i class="fa-solid fa-display"></i> Display</a>
+                                                                    <a class="dropdown-item text-danger delete-btn" data-url="{{ path('delete_event', {'id': e.id}) }}" href="#"><i class="fa-sharp fa-solid fa-trash"></i> Delete</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" id="confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Confirm Delete</h5>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete this item?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
+                                                        <a href="#" class="btn btn-danger confirm-delete-btn">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end card body -->
+                                        <div class="">
+                                            <div class="row g-0 border-top">
+                                                <div class="col">
+                                                    <div class="border-end p-3 h-100">
+                                                        <div>
+                                                            <p class="text-muted font-size-13 mb-2">Suggested By</p>
+                                                            {% for user in foundsuggeventusers %}
+                                                            <div class="badge badge-soft-info  font-size-14">{{ user.id }}</div>
+                                                            <div class="badge badge-soft-primary  font-size-14">{{ user.FirstName }} {{ user.SecondName }}</div>
+                                                            <div class="badge badge-soft-secondary  font-size-14">{{ user.Matricule }}</div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="border-end p-3 h-100">
+                                                        <div>
+                                                            <p class="text-muted font-size-13 mb-2">Start in</p>
+                                                            <div class="badge badge-soft-primary  font-size-14">{{ e.DateStart|date('Y-m-d') }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% set now = Today %}
+                                                {% set start = e.DateStart %}
+                                                {% set today_start = now.diff(start) %}
+                                                {% set end = e.DateEnd%}
+                                                {% set today_end = now.diff(end) %}
+                                                <div class="col">
+                                                    <div class="border-end p-3 h-100">
+                                                        <div>
+                                                            <p class="text-muted font-size-13 mb-2">Time</p>
+                                                            {% if today_start.invert %}
+                                                                {% if  now > start %}
+                                                            <div class="badge badge-soft-warning  font-size-14">{{ today_start.format('Started %d ago ') }}</div>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                {% if  now < start %}
+                                                             <div class="badge badge-soft-info  font-size-14">{{ today_start.format('%d Days Left to start') }}</div>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                            {% if today_end.invert %}
+                                                                {% if  now > end %}
+                                                                    <div class="badge badge-soft-warning  font-size-14">{{ today_end.format('Finised %d ago ') }}</div>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                {% if  now < end and now > start %}
+                                                                    <div class="badge badge-soft-danger  font-size-14">{{ today_end.format('Alrady started %d Days Left') }}</div>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="border-end p-3 h-100">
+                                                        <div>
+                                                            <p class="text-muted font-size-13 mb-2">End in</p>
+                                                            <h5 class="font-size-14 badge-soft-danger badge">{{ e.DateEnd|date('Y-m-d') }}</h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="border-end p-3 h-100">
+                                                        <div>
+                                                            <p class="text-muted font-size-13 mb-2">Status</p>
+                                                            {% if e.CheckValid == 0 %}
+                                                                <div class="badge bg-dark font-size-14">Pending</div>
+                                                            {% endif %}
+                                                            {% if e.CheckValid == 1 %}
+                                                                <div class="badge bg-info font-size-14">valid</div>
+                                                            {% endif %}
+                                                            {% if e.CheckValid == 2 %}
+                                                                <div class="badge bg-danger font-size-14">Declined</div>
+                                                            {% endif %}
+                                                            {% if e.CheckValid == 1 and e.CheckArchive == 1 %}
+                                                                <div class="badge bg-warning font-size-14">Archived</div>
+                                                            {% endif %}
+                                                            {% if e.CheckValid == 1 %}
+                                                                {% if today_start.invert %}
+                                                                    {% if  now < end and now > start %}
+                                                                        <div class="badge bg-success font-size-14">Active</div>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    {% if  now < start %}
+                                                                        <div class="badge badge-soft-primary  font-size-14">Coming Soon</div>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                                {% if today_end.invert %}
+                                                                    {% if  now > end %}
+                                                                        <div class="badge badge-soft-success  font-size-14">Completed</div>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="border-end p-3 h-100">
+                                                        <div>
+                                                            <div class="avatar-group align-items-center">
+                                                                <div class="avatar-group-item">
+                                                                    <p class="text-muted font-size-13 mb-2">Participants</p>
+                                                                    <a href="" class="d-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliza Hardin">
+                                                                        {% if e.CheckValid == 0 or e.CheckValid == 2 %}
+                                                                            <small>No participants allowed</small>
+                                                                        {% endif %}
+                                                                        {% if e.CheckValid == 1 %}
+                                                                            {% set i = 0 %}
+                                                                            {% if idUsers|length==0 %}
+                                                                                <small>participants available</small>
+                                                                            {% else %}
+                                                                                {% for idUser in idUsers %}
+                                                                                    {% set id_event = idUser['id_event'] %}
+                                                                                    {% if id_event == e.id %}
+                                                                                        {% set i = i + 1 %}
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                                <small>{{ i }} participants joined this event</small>
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                        <!--<div class="avatar-sm">
+                                                                            <span class="avatar-title rounded-circle bg-info text-white font-size-16">E</span>
+                                                                        </div>-->
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div><!-- end col -->
+                                            </div><!-- end row -->
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                                <!-- end card -->
+                            </div>
+                        </div>
+                    </div>
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success">{{ message }}</div>
+                    {% endfor %}
+                    {% for message in app.flashes('danger') %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+                    <!-- end tab pane -->
+                    <div class="tab-pane" id="list-Completed" role="tabpanel">
+                        <div>
+                            <div>
+                                {% if CE is empty%}
+                                <div class="card text-center">
+                                    <div class="card-header">
+                                        No Completed Events Found
+                                    </div>
+                                </div>
+                                {% else %}
+                                {% for c in CE %}
+                                {% set now = Today %}
+                                {% set start = c.DateStart %}
+                                {% set today_start = now.diff(start) %}
+                                {% set end = c.DateEnd%}
+                                {% set today_end = now.diff(end) %}
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex">
+                                            <div class="avatar">
+                                                <span class="avatar-title rounded-circle bg-info text-white font-size-16">{{ c.id }}</span>
+                                            </div>
+                                            <div class="flex-grow-1 me-2 flex-wrap ms-3">
+                                                <h5 class="font-size-15 mb-1"><a href="projects-overview.html" class="text-dark">{{ c.title }}</a></h5>
+                                                <p class="text-muted mb-0">{{ c.Discription }}</p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <div class="d-flex gap-2">
+                                                    <div class="dropdown">
+                                                        <a class="btn btn-light btn-sm dropdown-toggle" href="#" role="button"
+                                                           data-bs-toggle="dropdown" aria-haspopup="true">
+                                                            <i class="fa-sharp fa-solid fa-bars"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li><a class="dropdown-item text-secondary" href="#"><i class="fa-solid fa-box-archive"></i> Archive</a></li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li>
+                                                                <a class="dropdown-item text-primary" href="#"><i class="fa-solid fa-display"></i> Display</a>
+                                                                <a class="dropdown-item text-danger" href="#"><i class="fa-sharp fa-solid fa-trash"></i> Delete</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end card body -->
+                                    <div class="">
+                                        <div class="row g-0 border-top">
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Suggested By</p>
+                                                        {% for user in foundsuggeventusers %}
+                                                            <div class="badge badge-soft-info  font-size-14">{{ user.id }}</div>
+                                                            <div class="badge badge-soft-primary  font-size-14">{{ user.FirstName }} {{ user.SecondName }}</div>
+                                                            <div class="badge badge-soft-secondary  font-size-14">{{ user.Matricule }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Start in</p>
+                                                        <h5 class="font-size-14 badge-soft-primary badge">{{ c.DateStart|date('Y-m-d') }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">End in</p>
+                                                        <h5 class="font-size-14 badge-soft-danger badge">{{ c.DateEnd|date('Y-m-d') }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Time</p>
+                                                        {% if today_start.invert %}
+                                                            {% if  now > start %}
+                                                                <div class="badge badge-soft-secondary  font-size-14">{{ today_start.format('Started %d ago ') }}</div>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {% if  now < start %}
+                                                                <div class="badge badge-soft-info  font-size-14">{{ today_start.format('%d Days Left to start') }}</div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        {% if today_end.invert %}
+                                                            {% if  now > end %}
+                                                                <div class="badge badge-soft-info  font-size-14">{{ today_end.format('Finised %d ago ') }}</div>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {% if  now < end and now > start %}
+                                                                <div class="badge badge-soft-danger  font-size-14">{{ today_end.format('Alrady started %d Days Left') }}</div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-3 col-sm-6">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Status</p>
+                                                        <div class="badge bg-success font-size-12">Completed</div>
+                                                    </div>
+                                                </div>
+                                            </div><!-- end col -->
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <div class="avatar-group align-items-center">
+                                                            <div class="avatar-group-item">
+                                                                <p class="text-muted font-size-13 mb-2">Participants</p>
+                                                                <a href="" class="d-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliza Hardin">
+                                                                    {% set i = 0 %}
+                                                                    {% if idUsers|length==0 %}
+                                                                        <small>participants available</small>
+                                                                    {% else %}
+                                                                        {% for idUser in idUsers %}
+                                                                            {% set id_event = idUser['id_event'] %}
+                                                                            {% if id_event == c.id %}
+                                                                                {% set i = i + 1 %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        <small>{{ i }} participants joined this event</small>
+                                                                    {% endif %}
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div><!-- end col -->
+                                        </div><!-- end row -->
+                                    </div>
+                                </div><!-- end card -->
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- end tab pane -->
+                    {% endif %}
+                    <!-- end tab pane -->
+                    <div class="tab-pane" id="list-active" role="tabpanel">
+                        <div>
+                            <div>
+                                {% if AE is empty%}
+                                <div class="card text-center">
+                                    <div class="card-header">
+                                        No Active Events Found
+                                    </div>
+                                </div>
+                                {% else %}
+                                {% for a in AE %}
+                                {% set now = Today %}
+                                {% set start = a.DateStart %}
+                                {% set today_start = now.diff(start) %}
+                                {% set end = a.DateEnd%}
+                                {% set today_end = now.diff(end) %}
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex">
+                                            <div class="avatar">
+                                                <span class="avatar-title rounded-circle bg-info text-white font-size-16">{{ a.id }}</span>
+                                            </div>
+                                            <div class="flex-grow-1 me-2 flex-wrap ms-3">
+                                                <h5 class="font-size-15 mb-1"><a href="projects-overview.html" class="text-dark">{{ a.title }}</a></h5>
+                                                <p class="text-muted mb-0">{{ a.Discription }}</p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <div class="d-flex gap-2">
+                                                    <div class="dropdown">
+                                                        <a class="btn btn-light btn-sm dropdown-toggle" href="#" role="button"
+                                                           data-bs-toggle="dropdown" aria-haspopup="true">
+                                                            <i class="fa-sharp fa-solid fa-bars"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li><a class="dropdown-item text-secondary" href="#"><i class="fa-solid fa-box-archive"></i> Archive</a></li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li>
+                                                                <a class="dropdown-item text-primary" href="#"><i class="fa-solid fa-display"></i> Display</a>
+                                                                <a class="dropdown-item text-danger" href="#"><i class="fa-sharp fa-solid fa-trash"></i> Delete</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end card body -->
+                                    <div class="">
+                                        <div class="row g-0 border-top">
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Suggested By</p>
+                                                        {% for user in foundsuggeventusers %}
+                                                            <div class="badge badge-soft-info  font-size-14">{{ user.id }}</div>
+                                                            <div class="badge badge-soft-primary  font-size-14">{{ user.FirstName }} {{ user.SecondName }}</div>
+                                                            <div class="badge badge-soft-secondary  font-size-14">{{ user.Matricule }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Start in</p>
+                                                        <h5 class="font-size-14 badge-soft-primary badge">{{ a.DateStart|date('Y-m-d') }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">End in</p>
+                                                        <h5 class="font-size-14 badge-soft-danger badge">{{ a.DateEnd|date('Y-m-d') }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Time</p>
+                                                        {% if today_start.invert %}
+                                                            {% if  now > start %}
+                                                                <div class="badge badge-soft-secondary  font-size-14">{{ today_start.format('Started %d ago ') }}</div>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {% if  now < start %}
+                                                                <div class="badge badge-soft-info  font-size-14">{{ today_start.format('%d Days Left to start') }}</div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        {% if today_end.invert %}
+                                                            {% if  now > end %}
+                                                                <div class="badge badge-soft-info  font-size-14">{{ today_end.format('Finised %d ago ') }}</div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-3 col-sm-6">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-2">Status</p>
+                                                        <div class="badge bg-primary font-size-12">Active</div>
+                                                    </div>
+                                                </div>
+                                            </div><!-- end col -->
+                                            <div class="col">
+                                                <div class="border-end p-3 h-100">
+                                                    <div>
+                                                        <div class="avatar-group align-items-center">
+                                                            <div class="avatar-group-item">
+                                                                <p class="text-muted font-size-13 mb-2">Participants</p>
+                                                                <a href="" class="d-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliza Hardin">
+                                                                    {% set i = 0 %}
+                                                                    {% if idUsers|length==0 %}
+                                                                        <small>participants available</small>
+                                                                    {% else %}
+                                                                    {% for idUser in idUsers %}
+                                                                        {% set id_event = idUser['id_event'] %}
+                                                                        {% if id_event == a.id %}
+                                                                            {% set i = i + 1 %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                        <small>{{ i }} participants joined this event</small>
+                                                                    {% endif %}
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div><!-- end col -->
+                                        </div><!-- end row -->
+                                    </div>
+                                </div><!-- end card -->
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- end tab pane -->
+                    {% endif %}
+                </div>
+                <!-- end tab content -->
+            </div><!-- end card body -->
+        </div><!-- end card -->
+    </div><!-- end col -->
+</div><!-- end row -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $('.delete-btn').click(function(e) {
+            e.preventDefault();
+            var url = $(this).data('url');
+            $('#confirm-delete-modal').modal('show');
+            $('.confirm-delete-btn').on('click', function() {
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    success: function() {
+                        $('#confirm-delete-modal').modal('hide');
+                        location.reload();
+                    }
+
+                });
+            });
+        });
+        $('.btn-cancel').click(function(e) {
+            e.preventDefault();
+            $('#confirm-delete-modal').modal('hide');
+        });
+
+    </script>
+{% endblock %}

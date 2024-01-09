@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+<section class="vh-100">
+    <div class="container-fluid h-custom">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-9 col-lg-6 col-xl-5">
+                <img src="{{ asset('images/log.png') }}"
+                     class="img-fluid" alt="Sample image">
+            </div>
+            <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Login</p>
+                <form method="post">
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="mb-3">
+                            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                        </div>
+                    {% endif %}
+                    <div class="form-outline mb-4">
+                        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                        <label class="form-label" for="form3Example3">Email address</label>
+                    </div>
+                    <div class="form-outline mb-3">
+                        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                        <label class="form-label" for="form3Example4">Password</label>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input me-2" type="hidden" value="" id="form2Example3" />
+                        </div>
+                        <a href="#!" class="text-body">Forgot password?</a>
+                    </div>
+                    <!-- hidden -->
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="text-center text-lg-start mt-4 pt-2">
+                        <button class="btn btn-lg btn-primary" type="submit"style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+                        <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="{{ path('app_register') }}" class="link-danger">Register</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

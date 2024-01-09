@@ -1,0 +1,234 @@
+{% extends 'home/base.html.twig' %}
+{% block title %}User Dashboard{% endblock %}
+{% block body %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <a class="btn btn-light" data-url="" href="#">New Event</a>
+                        </div>
+                    </div><!-- end col -->
+                </div><!-- end row -->
+                <div class="modal fade" id="confirm-add-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        {{ form_start(form) }}
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Add a new Date</h5>
+                            </div>
+                            <div class="modal-body">
+                                {{ form_start(form) }}
+                                <!--Are you sure you want to delete this item?-->
+                                    {{ form_row(form.title, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(form.Discription, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(form.deadline, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(form.DateStart, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(form.DateEnd, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(form.Link, {'attr': {'class': 'form-control'}}) }}
+                                <button class="btn btn-success" style="float: right;margin-top: 20px;">{{ button_label|default('Save') }}</button>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <ul class="nav nav-tabs nav-tabs-custom mb-4" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#grid-all" role="tab">All</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#grid-suggested">Suggested</a>
+                        </li>
+                    </ul><!-- end ul -->
+                </div>
+
+                <!-- Tab content -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="grid-all" role="tabpanel">
+                        <div class="row">
+                            {% for ae in approved_event %}
+                                {% set red = random(0, 255) %}
+                                {% set green = random(0, 255) %}
+                                {% set blue = random(0, 255) %}
+                            <div class="col-xl-3 col-sm-6">
+                                <div class="card">
+                                    <div class="card-body pb-3">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="flex-grow-1">
+                                                <div class="avatar-sm">
+                                                    <span class="avatar-title rounded-circle text-white font-size-16" style="background-color: rgb({{ red }}, {{ green }}, {{ blue }})">{{ ae.id }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <div class="dropdown">
+                                                    <a class="text-body dropdown-toggle font-size-16" href="#" role="button"
+                                                       data-bs-toggle="dropdown" aria-haspopup="true">
+                                                        <i class="fa-solid fa-bars"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li><a class="dropdown-item" href="{{ path('app_home_display', {'identidfiant': ae.id}) }}"><i class="fa-solid fa-eye"></i> Display</a></li>
+                                                        <li><a class="dropdown-item" href="{{ path('app_home_part_show', {'identidfiant': ae.id}) }}"><i class="fa-solid fa-user"></i> participants</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pt-2">
+                                            <h5 class="font-size-15 mb-1 text-truncate"><a href="projects-overview.html" class="text-dark">{{ ae.title }}</a></h5>
+                                            <p class="text-muted mb-4 text-truncate">{{ ae.Discription }}</p>
+                                        </div>
+                                        {% set now = Today %}
+                                        {% set start = ae.DateStart %}
+                                        {% set deadline = ae.Deadline %}
+                                        {% set today_start = now.diff(start) %}
+                                        {% set end = ae.DateEnd%}
+                                        {% set today_end = now.diff(end) %}
+                                        <div class="pt-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                {% if today_end.invert %}
+                                                    {% if  now > end %}
+                                                        <span class="badge badge-soft-danger font-size-12"><i class="fa-solid fa-check"></i>{{ today_end.format('Finised %d ago ') }}</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if  now < end and now > start %}
+                                                    <span class="badge badge-soft-danger font-size-12"><i class="mdi mdi-clock-outline font-size-14 me-1 align-middle"></i>{{ today_end.format('%d Days Left') }}</span>
+                                                    {% endif %}
+                                                    {% if today_start.invert %}
+                                                        {% if  now > start %}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if  now < start %}
+                                                            <span class="badge badge-soft-primary font-size-12"><i class="mdi mdi-clock-outline font-size-14 me-1 align-middle"></i>{{ today_start.format('%d Days Left to start') }}</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endif %}
+                                                <div class="avatar-group align-items-center">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        {% if  Today > deadline %}
+                                                            <span class="text-danger font-size-12">Too Late To Join This Event</span>
+                                                        {% else %}
+                                                            {% if check|length == 0%}
+                                                                <a href="{{ path('add_participant', {'id_event': ae.id,'id_user': id,'user_matricule':mat}) }}" class="btn btn-primary">Join</a>
+                                                            {% else %}
+                                                                <span class="text-success font-size-12">Joined</span>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- end card body -->
+                                </div><!-- end card -->
+                            </div><!-- end col -->
+                            {% endfor %}
+                        </div><!-- end row -->
+                    </div>
+                    <!-- end tab pane -->
+                    <div class="tab-pane" id="grid-suggested" role="tabpanel">
+                        <div class="row">
+                            <div class="col-xl-3 col-sm-6">
+                                <div class="card">
+                                    <div class="card-body pb-3">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="flex-grow-1">
+                                                <div class="avatar">
+                                                    <img src="assets/images/companies/img-2.png" alt="" class="avatar">
+                                                </div>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <div class="dropdown">
+                                                    <a class="text-body dropdown-toggle font-size-16" href="#" role="button"
+                                                       data-bs-toggle="dropdown" aria-haspopup="true">
+                                                        <i class="fa-solid fa-bars"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li><a class="dropdown-item" href="">Display</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pt-2">
+                                            <h5 class="font-size-15 mb-1 text-truncate"><a href="projects-overview.html" class="text-dark">Brand Logo Design</a></h5>
+                                            <p class="text-muted mb-4 text-truncate">Sed ut perspiciatis unde iste</p>
+                                        </div>
+
+                                        <div class="progress mt-1" style="height: 6px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="52" aria-valuemin="0" aria-valuemax="52">
+                                            </div>
+                                        </div>
+
+                                        <div class="pt-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="badge badge-soft-danger font-size-12"><i class="mdi mdi-clock-outline font-size-14 me-1 align-middle"></i> 4 days left</span>
+                                                <div class="avatar-group align-items-center">
+                                                    <div class="me-4">Team :</div>
+                                                    <div class="avatar-group-item">
+                                                        <a href="javascript: void(0);" class="d-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Janna Johnson">
+                                                            <img src="assets/images/users/avatar-1.jpg" alt="" class="rounded-circle avatar-sm">
+                                                        </a>
+                                                    </div>
+                                                    <div class="avatar-group-item">
+                                                        <a href="javascript: void(0);" class="d-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Heather Ford">
+                                                            <img src="assets/images/users/avatar-2.jpg" alt="" class="rounded-circle avatar-sm">
+                                                        </a>
+                                                    </div>
+                                                    <div class="avatar-group-item">
+                                                        <a href="javascript: void(0);" class="d-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliza Hardin">
+                                                            <div class="avatar-sm">
+                                                                                        <span class="avatar-title rounded-circle bg-info text-white font-size-16">
+                                                                                            E
+                                                                                        </span>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                    <div class="avatar-group-item">
+                                                        <a href="javascript: void(0);" class="d-block" data-bs-toggle="tooltip" data-bs-placement="top" title="Megan Seaton">
+                                                            <img src="assets/images/users/avatar-4.jpg" alt="" class="rounded-circle avatar-sm">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- end card body -->
+                                </div>
+                                <!-- end card -->
+                            </div>
+                            <!-- end col -->
+                        </div><!-- end row -->
+                    </div>
+                </div>
+            </div><!-- end card body -->
+        </div><!-- end card -->
+    </div>
+</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $('.btn-light').click(function(e) {
+            e.preventDefault();
+            var url = $(this).data('url');
+            $('#confirm-add-modal').modal('show');
+            $('.confirm-add-btn').on('click', function() {
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    success: function() {
+                        $('#confirm-add-modal').modal('hide');
+                        location.reload();
+                    }
+
+                });
+            });
+        });
+        $('.btn-cancel').click(function(e) {
+            e.preventDefault();
+            $('#confirm-add-modal').modal('hide');
+        });
+
+    </script>
+{% endblock %}
