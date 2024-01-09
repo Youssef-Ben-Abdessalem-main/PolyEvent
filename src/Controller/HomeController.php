@@ -78,12 +78,11 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-
-        //get current date
+        // get current date
         $currentDate = new DateTime();
         $currentDate->setTime(0, 0, 0);
 
-        //Find approved event
+        // Find approved events
         $activated = $this->em->createQueryBuilder()
             ->select('e')
             ->from(Events::class, 'e')
@@ -91,32 +90,33 @@ class HomeController extends AbstractController
         $queryActive = $activated->getQuery();
         $active = $queryActive->getResult();
 
-        //check if current user is joined the event or not
+
+
+        $eventIdToCheck = 1;
+
+        // check if the current user is joined the event or not
         $check = $this->em->createQueryBuilder()
             ->select('e')
             ->from(Participants::class, 'e')
-            ->where('e.id_user = :identify_user')
-            ->setParameter('identify_user',$id);
+            ->where('e.id_user = :userId')
+            ->setParameter('userId', $id);
+
         $query_check = $check->getQuery();
         $check_done = $query_check->getResult();
 
-
-        $eventIdToCheck = 1; 
-        $userJoinedEvent = $this->hasUserJoinedEvent($eventIdToCheck);
-
         return $this->render('home/index.html.twig', [
-            'id'=>$id,
+            'id' => $id,
             'firstName' => $firstName,
             'secondName' => $secondName,
-            'approved_event'=>$active,
-            'Today'=>$currentDate,
-            'mat'=>$matricule,
-            'check'=>$check_done,
+            'approved_event' => $active,
+            'Today' => $currentDate,
+            'mat' => $matricule,
+            'check' => $check_done,
             'form' => $form->createView(),
             'eventIdToCheck' => $eventIdToCheck,
-            'userJoinedOrNot'=> $userJoinedEvent
         ]);
     }
+
 
     #[Route('/home/addevent', name: 'addevent')]
     public function add_event(Request $request): Response
